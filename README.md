@@ -1,6 +1,6 @@
 # simple_cookies
 
-A new Flutter package project.
+A simple Package for Managing Cookies in Flutter Web and creating CookieBanners.
 
 ## Getting Started
 
