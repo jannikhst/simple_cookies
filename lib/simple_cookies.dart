@@ -1,7 +1,7 @@
 library simple_cookies;
 
 import 'package:flutter/material.dart';
-import 'package:universal_html/prefer_universal/html.dart' as uni;
+import 'package:universal_html/html.dart' as uni;
 
 /// Class for controlling your Cookies and creating CookieBanners.
 /// IMPORTANT: Don't forget to change the default value of your main-cookie-id: [acceptedCookiesId].
@@ -14,13 +14,13 @@ class Cookies {
   /// Wrap [Cookie.wrapBanner(child)] around your Site to show the CookieBanner if needed.
   /// Create your own CookieBanner by creating your own Banner Class which extends [CookieBanner].
   /// IMPORTANT: Don't forget to change the default value of your main-cookie-id: [acceptedCookiesId].
-  static Widget wrapBanner({@required Widget child, CookieBanner banner}) =>
+  static Widget wrapBanner({required Widget child, CookieBanner? banner}) =>
       Scaffold(body: _WrapBanner(child, banner: banner));
 
   /// Call this if you want to check if the users allowed cookies and show a banner if not.
   /// Create your own CookieBanner [banner] by creating your own Banner Class which extends [CookieBanner].
   /// The [acceptedId] of your own CookieBanner overwrites the [acceptedCookiesId].
-  static void checkAccepted(BuildContext context, {CookieBanner banner}) {
+  static void checkAccepted(BuildContext context, {CookieBanner? banner}) {
     if (banner == null && !exists(acceptedCookiesId)) _PopUp.show(context);
     if (banner != null && !exists(banner.acceptedId))
       _PopUp.show(context, alternative: banner);
@@ -31,7 +31,7 @@ class Cookies {
 
   /// Returns the content of the cookie with [id].
   /// Returns [null] if there is no Cookie.
-  static String get(String id) => _storage.get(id);
+  static String? get(String id) => _storage.get(id);
 
   /// Checks if there exists a cookie with [id].
   static bool exists(String id) => _storage.get(id) != null;
@@ -53,8 +53,8 @@ class _WebStorage {
     set(Cookies.acceptedCookiesId, null);
   }
 
-  String get(String id) => uni.window.localStorage[id] ?? null;
-  void set(String id, String content) {
+  String? get(String id) => uni.window.localStorage[id] ?? null;
+  void set(String id, String? content) {
     _history.putIfAbsent(id, () => DateTime.now().toIso8601String());
     (content == null)
         ? uni.window.localStorage.remove(id)
@@ -65,7 +65,7 @@ class _WebStorage {
 class _PopUp extends StatelessWidget {
   final Color dark = Color.fromRGBO(35, 39, 42, 1);
   final Color light = Color.fromRGBO(64, 70, 74, 1);
-  static show(BuildContext context, {Widget alternative}) => showBottomSheet(
+  static show(BuildContext context, {Widget? alternative}) => showBottomSheet(
         backgroundColor: Colors.transparent,
         context: context,
         builder: (ctx) => alternative ?? _PopUp(),
@@ -96,7 +96,7 @@ class _PopUp extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       if (Cookies.exists(Cookies.acceptedCookiesId))
                         Cookies.remove(Cookies.acceptedCookiesId);
@@ -109,8 +109,10 @@ class _PopUp extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: RaisedButton(
-                    color: Colors.green,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.green,
+                    ),
                     onPressed: () {
                       Cookies.create(Cookies.acceptedCookiesId, 'true');
                       Navigator.pop(context);
@@ -154,7 +156,7 @@ abstract class CookieBanner extends StatelessWidget {
 
 class _WrapBanner extends StatelessWidget {
   final Widget child;
-  final CookieBanner banner;
+  final CookieBanner? banner;
   _WrapBanner(this.child, {this.banner});
 
   @override
